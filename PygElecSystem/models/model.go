@@ -8,7 +8,7 @@ import (
 //定义用户类
 type User struct {
 	Id int
-	Name string 			`orm:"size(40)"`
+	Name string 			`orm:"size(40);unique"`
 	Pwd string 				`orm:"size(40)"`
 	Phone string 			`orm:"size(11)"`
 	Email string 			`orm:"null"`
@@ -31,6 +31,6 @@ func init(){
 	orm.RegisterDataBase("default","mysql","root:123456@tcp(127.0.0.1:3306)/pygEs")
 	//注册表结构
 	orm.RegisterModel(new(User),new(Address))
-	//跑起来
+	//运行生成表
 	orm.RunSyncdb("default",false,true)
 }

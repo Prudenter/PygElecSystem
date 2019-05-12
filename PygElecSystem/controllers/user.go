@@ -223,7 +223,7 @@ func (this *UserController) HandleRegisterEmail() {
 	o := orm.NewOrm()
 	var user models.User
 	user.Name = userName
-	err = o.Read(&user)
+	err = o.Read(&user,"Name")
 	if err != nil {
 		fmt.Println("注册失败,请重新注册")
 		this.Data["errmsg"] = "注册失败,请重新注册"
@@ -232,6 +232,8 @@ func (this *UserController) HandleRegisterEmail() {
 	}
 	//插入邮件字段
 	user.Email = email
+	//修改邮箱!!
+	o.Update(&user)
 	//返回数据
 	this.Ctx.WriteString("邮件已发送，请去您的邮箱激活用户！")
 }
@@ -343,11 +345,38 @@ func (this *UserController) HandleLogin() {
 		//设置存活时间为-1,使cookie失效
 		this.Ctx.SetCookie("userName", userName, -1)
 	}
+	//设置session,用于登陆后页面使用
+	this.SetSession("userName",user.Name)
 	//返回数据
 	this.Redirect("/index", 302)
 }
 
-/* 定义函数,负责首页展示 */
-func (this *UserController) ShowIndex() {
-	this.TplName = "index.html"
+/* 定义函数,负责退胡登录业务处理 */
+func (this *UserController) Logout() {
+	//删除session
+	this.DelSession("userName")
+	//跳转页面
+	this.Redirect("/index",302)
+}
+
+/* 定义函数,负责用户中心页面展示 */
+func (this *UserController) ShowUserCenterInfo() {
+	this.TplName = "user_center_info.html"
+}
+
+/* 定义函数,负责收货地址页面展示 */
+func (this *UserController) ShowSite() {
+	this.TplName = "user_center_site.html"
+}
+
+/* 定义函数,负责添加地址业务处理 */
+func (this *UserController) HandleSite() {
+	//获取数据
+	receiver := this.GetString("receiver")
+	addr := this.GetString("addr")
+	postCode := this.GetString("postCode")
+	phone := this.GetString("phone")
+	if receiver == "" || addr == "" || postCode==""|| phone==""{
+
+	}
 }

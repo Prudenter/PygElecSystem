@@ -23,6 +23,7 @@ type Address struct {
 	Addr string 			`orm:"size(100)"`
 	PostCode string 		`orm:"size(6)"`
 	Phone string 			`orm:"size(11)"`
+	IsDefault bool			`orm:"default(false)"`  //是否时默认地址
 	User *User 				`orm:"rel(fk)"`
 }
 

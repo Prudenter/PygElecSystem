@@ -17,3 +17,8 @@ func (this *GoodsController) ShowIndex() {
 	}
 	this.TplName = "index.html"
 }
+
+/* 定义函数,负责全部订单页面显示 */
+func (this *GoodsController) ShowOrder() {
+	this.TplName = "user_center_order.html"
+}

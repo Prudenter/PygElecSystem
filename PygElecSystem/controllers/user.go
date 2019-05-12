@@ -12,6 +12,7 @@ import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"math/rand"
 	"github.com/astaxie/beego/utils"
+	"strings"
 )
 
 /* 定义用户控制器类:UserController */
@@ -223,7 +224,7 @@ func (this *UserController) HandleRegisterEmail() {
 	o := orm.NewOrm()
 	var user models.User
 	user.Name = userName
-	err = o.Read(&user,"Name")
+	err = o.Read(&user, "Name")
 	if err != nil {
 		fmt.Println("注册失败,请重新注册")
 		this.Data["errmsg"] = "注册失败,请重新注册"
@@ -346,7 +347,7 @@ func (this *UserController) HandleLogin() {
 		this.Ctx.SetCookie("userName", userName, -1)
 	}
 	//设置session,用于登陆后页面使用
-	this.SetSession("userName",user.Name)
+	this.SetSession("userName", user.Name)
 	//返回数据
 	this.Redirect("/index", 302)
 }
@@ -356,7 +357,7 @@ func (this *UserController) Logout() {
 	//删除session
 	this.DelSession("userName")
 	//跳转页面
-	this.Redirect("/index",302)
+	this.Redirect("/index", 302)
 }
 
 /* 定义函数,负责用户中心页面展示 */
@@ -366,17 +367,81 @@ func (this *UserController) ShowUserCenterInfo() {
 
 /* 定义函数,负责收货地址页面展示 */
 func (this *UserController) ShowSite() {
+	//查询数据库,显示默认地址
+	o := orm.NewOrm()
+	var address models.Address
+	//获取当前用户的默认地址
+	userName := this.GetSession("userName").(string)
+	qs := o.QueryTable("Address")
+	qs.RelatedSel("User").Filter("User__Name", userName).Filter("IsDefault", true).One(&address)
+	if address.Phone != "" {
+		str := address.Phone
+		address.Phone = strings.Join([]string{str[0:3], "****", str[7:]}, "")
+	}
+	this.Data["address"] = address
 	this.TplName = "user_center_site.html"
 }
 
-/* 定义函数,负责添加地址业务处理 */
+/* 定义函数,负责新增地址业务处理 */
 func (this *UserController) HandleSite() {
 	//获取数据
 	receiver := this.GetString("receiver")
 	addr := this.GetString("addr")
 	postCode := this.GetString("postCode")
 	phone := this.GetString("phone")
-	if receiver == "" || addr == "" || postCode==""|| phone==""{
-
+	//校验数据
+	if receiver == "" || addr == "" || postCode == "" || phone == "" {
+		fmt.Println("收件人,收货地址或联系电话不能为空!")
+		this.Data["errmsg"] = "收件人,收货地址或联系电话不能为空!"
+		this.TplName = "user_center_site.html"
+		return
 	}
+	//检查电话号码格式是否正确
+	reg, _ := regexp.Compile(`^1[3-9][0-9]{9}$`)
+	ret := reg.FindString(phone)
+	if ret == "" {
+		fmt.Println("电话号码格式错误！")
+		this.Data["errmsg"] = "电话号码格式错误!"
+		this.TplName = "user_center_site.html"
+		return
+	}
+	//处理数据,插入数据
+	o := orm.NewOrm()
+	var address models.Address
+	//获取当前登录用户
+	var user models.User
+	userName := this.GetSession("userName").(string)
+	user.Name = userName
+	o.Read(&user, "Name")
+	//给插入对象赋值
+	address.Addr = addr
+	address.User = &user
+	address.Phone = phone
+	address.PostCode = postCode
+	address.Receiver = receiver
+	//设置当前插入的address为默认地址-
+	// 要先查询当前用户是否有默认地址,如果有,则把默认地址修改为非默认,在设置当前地址为默认地址;如果没有直接设置为默认地址
+	var defaultAddr models.Address
+	qs := o.QueryTable("Address")
+	err := qs.RelatedSel("User").Filter("User__Name", userName).Filter("IsDefault", true).One(&defaultAddr)
+	if err == nil {
+		defaultAddr.IsDefault = false
+		o.Update(&defaultAddr, "IsDefault")
+	}
+	address.IsDefault = true
+	//插入当前地址
+	_, err = o.Insert(&address)
+	if err != nil {
+		fmt.Println("地址插入失败！")
+		this.Data["errmsg"] = "地址插入失败!"
+		this.TplName = "user_center_site.html"
+		return
+	}
+	//返回数据
+	this.Redirect("/user/site", 302)
+}
+
+/* 定义函数,负责个人信息页面显示 */
+func (this *UserController) ShowInfo() {
+	this.TplName = "user_center_info.html"
 }

@@ -352,7 +352,7 @@ func (this *UserController) HandleLogin() {
 	this.Redirect("/index", 302)
 }
 
-/* 定义函数,负责退胡登录业务处理 */
+/* 定义函数,负责退出登录业务处理 */
 func (this *UserController) Logout() {
 	//删除session
 	this.DelSession("userName")
@@ -360,13 +360,35 @@ func (this *UserController) Logout() {
 	this.Redirect("/index", 302)
 }
 
-/* 定义函数,负责用户中心页面展示 */
+/* 定义函数,负责用户中心个人信息页面展示 */
 func (this *UserController) ShowUserCenterInfo() {
+	//调用函数,获取当前登录用户
+	user := GetUser(this)
+	this.Data["user"] = user
+	//调用函数,获取当前登录用户的默认地址
+	this.Data["address"] = GetUserAddr(this)
+	//实现视图布局,将模板与主要部分连接其起来
+	this.Layout = "user_center_layout.html"
+	this.Data["num"] = 1
 	this.TplName = "user_center_info.html"
 }
 
-/* 定义函数,负责收货地址页面展示 */
-func (this *UserController) ShowSite() {
+/* 定义函数,获取当前登录用户 */
+func GetUser(this *UserController) models.User {
+	//根据session获取当前登录用户名
+	userName := this.GetSession("userName")
+	o := orm.NewOrm()
+	var user models.User
+	user.Name = userName.(string)
+	o.Read(&user,"Name")
+	//手机号码加密
+	str := user.Phone
+	user.Phone = strings.Join([]string{str[0:3],"****",str[7:]},"");
+	return user
+}
+
+/* 定义函数,查询当前用户默认地址*/
+func GetUserAddr(this *UserController) models.Address {
 	//查询数据库,显示默认地址
 	o := orm.NewOrm()
 	var address models.Address
@@ -374,11 +396,25 @@ func (this *UserController) ShowSite() {
 	userName := this.GetSession("userName").(string)
 	qs := o.QueryTable("Address")
 	qs.RelatedSel("User").Filter("User__Name", userName).Filter("IsDefault", true).One(&address)
+	//手机号码加密
 	if address.Phone != "" {
 		str := address.Phone
 		address.Phone = strings.Join([]string{str[0:3], "****", str[7:]}, "")
 	}
-	this.Data["address"] = address
+	return address
+}
+
+
+/* 定义函数,负责收货地址页面展示 */
+func (this *UserController) ShowSite() {
+	//调用函数,获取当前登录用户
+	user := GetUser(this)
+	this.Data["user"] = user
+	//调用函数,获取当前登录用户的默认地址
+	this.Data["address"] = GetUserAddr(this)
+	//实现视图布局,将模板与主要部分连接其起来
+	this.Layout = "user_center_layout.html"
+	this.Data["num"] = 3
 	this.TplName = "user_center_site.html"
 }
 
@@ -393,7 +429,7 @@ func (this *UserController) HandleSite() {
 	if receiver == "" || addr == "" || postCode == "" || phone == "" {
 		fmt.Println("收件人,收货地址或联系电话不能为空!")
 		this.Data["errmsg"] = "收件人,收货地址或联系电话不能为空!"
-		this.TplName = "user_center_site.html"
+		this.Redirect("/user/site", 302)
 		return
 	}
 	//检查电话号码格式是否正确
@@ -402,17 +438,14 @@ func (this *UserController) HandleSite() {
 	if ret == "" {
 		fmt.Println("电话号码格式错误！")
 		this.Data["errmsg"] = "电话号码格式错误!"
-		this.TplName = "user_center_site.html"
+		this.Redirect("/user/site", 302)
 		return
 	}
 	//处理数据,插入数据
 	o := orm.NewOrm()
 	var address models.Address
-	//获取当前登录用户
-	var user models.User
-	userName := this.GetSession("userName").(string)
-	user.Name = userName
-	o.Read(&user, "Name")
+	//调用函数,获取当前登录用户
+	user := GetUser(this)
 	//给插入对象赋值
 	address.Addr = addr
 	address.User = &user
@@ -423,7 +456,7 @@ func (this *UserController) HandleSite() {
 	// 要先查询当前用户是否有默认地址,如果有,则把默认地址修改为非默认,在设置当前地址为默认地址;如果没有直接设置为默认地址
 	var defaultAddr models.Address
 	qs := o.QueryTable("Address")
-	err := qs.RelatedSel("User").Filter("User__Name", userName).Filter("IsDefault", true).One(&defaultAddr)
+	err := qs.RelatedSel("User").Filter("User__Name", user.Name).Filter("IsDefault", true).One(&defaultAddr)
 	if err == nil {
 		defaultAddr.IsDefault = false
 		o.Update(&defaultAddr, "IsDefault")
@@ -434,14 +467,9 @@ func (this *UserController) HandleSite() {
 	if err != nil {
 		fmt.Println("地址插入失败！")
 		this.Data["errmsg"] = "地址插入失败!"
-		this.TplName = "user_center_site.html"
+		this.Redirect("/user/site", 302)
 		return
 	}
 	//返回数据
 	this.Redirect("/user/site", 302)
-}
-
-/* 定义函数,负责个人信息页面显示 */
-func (this *UserController) ShowInfo() {
-	this.TplName = "user_center_info.html"
 }

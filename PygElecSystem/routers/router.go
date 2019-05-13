@@ -8,7 +8,7 @@ import (
 
 func init() {
 	//定义路由过滤器
-	beego.InsertFilter("/user/*sss", beego.BeforeExec, filterFunc)
+	beego.InsertFilter("/user/*", beego.BeforeExec, filterFunc)
 	beego.Router("/", &controllers.MainController{})
 	//用户注册
 	beego.Router("/register", &controllers.UserController{}, "get:ShowRegister;post:HandleRegister")
@@ -24,13 +24,11 @@ func init() {
 	beego.Router("/index", &controllers.GoodsController{}, "get:ShowIndex")
 	//退出登录
 	beego.Router("/user/logout", &controllers.UserController{}, "get:Logout")
-	//展示用户中心
+	//用户中心个人信息页面展示
 	beego.Router("/user/userCenterInfo", &controllers.UserController{}, "get:ShowUserCenterInfo")
-	//收货地址页面
+	//用户中心收货地址页面
 	beego.Router("/user/site", &controllers.UserController{}, "get:ShowSite;post:HandleSite")
-	//个人信息页面
-	beego.Router("/user/info", &controllers.UserController{}, "get:ShowInfo")
-	//全部订单页面
+	//用户中心全部订单页面
 	beego.Router("/user/order", &controllers.GoodsController{}, "get:ShowOrder")
 }
 

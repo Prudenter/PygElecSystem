@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>品优购，优质！优质！-用户中心</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+</head>
+<body>
+<div class="header_con">
+    <div class="header">
+        <div class="welcome fl">欢迎来到品优购生鲜!</div>
+        <div class="fr">
+            <div class="login_btn fl">
+                {{if compare .user.Name ""}}
+                    <a href="/login">登录</a>
+                    <span>|</span>
+                    <a href="/register">注册</a>
+                {{else}}
+                    <ul class="fl">
+                        <li class="f-item">欢迎您：<em>{{.user.Name}}</em><span><a href="/user/logout" target="_self" style="color: blue;">退出登录</a></span></li>
+                    </ul>
+                {{end}}
+            </div>
+            <div class="user_link fl">
+                <span>|</span>
+                <a href="user_center_info.html">用户中心</a>
+                <span>|</span>
+                <a href="cart.html">我的购物车</a>
+                <span>|</span>
+                <a href="user_center_order.html">我的订单</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="search_bar clearfix">
+    <a href="index.html" class="logo fl"><img src="../static/images/logo.png"></a>
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+    <div class="search_con fr">
+        <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+        <input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+</div>
+
+<div class="main_con clearfix">
+    <div class="left_menu_con clearfix">
+        <h3>用户中心</h3>
+        <ul>
+            <li><a href="/user/userCenterInfo" {{if compare .num 1}}class="active"{{end}}>· 个人信息</a></li>
+            <li><a href="/user/order" {{if compare .num 2}}class="active"{{end}}>· 全部订单</a></li>
+            <li><a href="/user/site" {{if compare .num 3}}class="active"{{end}}>· 收货地址</a></li>
+        </ul>
+    </div>
+
+{{.LayoutContent}}
+
+</div>
+
+<div class="py-container copyright footer">
+    <ul>
+        <li>关于我们</li>
+        <li>联系我们</li>
+        <li>联系客服</li>
+        <li>商家入驻</li>
+        <li>营销中心</li>
+        <li>手机品优购</li>
+        <li>销售联盟</li>
+        <li>品优购社区</li>
+    </ul>
+    <div class="address">地址：北京市昌平区建材城西路金燕龙办公楼一层 邮编：100096 电话：400-618-4000 传真：010-82935100</div>
+    <div class="beian">京ICP备08001421号京公网安备110108007702
+    </div>
+</div>
+</body>
+</html>

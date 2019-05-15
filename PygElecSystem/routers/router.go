@@ -30,6 +30,10 @@ func init() {
 	beego.Router("/user/site", &controllers.UserController{}, "get:ShowSite;post:HandleSite")
 	//用户中心全部订单页面
 	beego.Router("/user/order", &controllers.GoodsController{}, "get:ShowOrder")
+	//生鲜首页
+	beego.Router("/index_sx", &controllers.GoodsController{}, "get:ShowIndex_sx")
+	//商品详情
+	beego.Router("/goodsDetail", &controllers.GoodsController{}, "get:ShowGoodsDetail")
 }
 
 /* 定义过滤函数 */

@@ -34,6 +34,8 @@ func init() {
 	beego.Router("/index_sx", &controllers.GoodsController{}, "get:ShowIndex_sx")
 	//商品详情
 	beego.Router("/goodsDetail", &controllers.GoodsController{}, "get:ShowGoodsDetail")
+	//展示同一类型所有商品
+	beego.Router("/goodsType", &controllers.GoodsController{}, "get:ShowTypeList")
 }
 
 /* 定义过滤函数 */

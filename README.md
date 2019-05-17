@@ -29,20 +29,20 @@ Linux系统下开发，主要开发工具包括:Linux,Git,GoLand,mysql,redis等�
 
 + [Ubuntu18.04](http://baidu.com)
 ### 开发环境安装
-#### Go语言安装
-***
-#### IDE安装
++ **Go语言安装**
 ---
-#### Beego框架安装
++ **IDE安装**
 ---
-#### Mysql安装
++ **Beego框架安装**
 ---
-#### Redis安装
++ Mysql安装
 ---
-#### FastDFS安装
++ Redis安装
 ---
-#### Nginx安装
-
++ FastDFS安装
+---
++ Nginx安装
+---
 ## 用法
 后续更新
 

@@ -115,15 +115,13 @@
         </ul>
 
         <div class="pagenation">
-            <a href="#">
+            <a href="/goodsType?id={{.id}}&sort={{.sort}}&pageIndex={{.prePage}}">
                 <上一页
             </a>
-            <a href="#" class="active">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-            <a href="#">下一页></a>
+            {{range $key,$value := .pages}}
+                <a href="/goodsType?id={{$.id}}&sort={{$.sort}}&pageIndex={{$value}}" class="active">{{$value}}</a>
+            {{end}}
+            <a href="/goodsType?id={{.id}}&sort={{.sort}}&pageIndex={{.nextPage}}">下一页></a>
         </div>
     </div>
 </div>

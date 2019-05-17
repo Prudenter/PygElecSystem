@@ -6,6 +6,7 @@ import (
 	"strings"
 	"PygElecSystem/PygElecSystem/models"
 	"fmt"
+	"math"
 )
 
 type GoodsController struct {
@@ -180,11 +181,11 @@ func (this *GoodsController) ShowGoodsDetail() {
 
 	//获取商品详情
 	qs := o.QueryTable("GoodsSKU")
-	qs.RelatedSel("Goods","GoodsType").Filter("Id",id).One(&goodsSKU)
+	qs.RelatedSel("Goods", "GoodsType").Filter("Id", id).One(&goodsSKU)
 
 	//获取同一类型的新品推荐
 	var newGoods []models.GoodsSKU
-	qs.RelatedSel("GoodsType").Filter("GoodsType__Name",goodsSKU.GoodsType.Name).OrderBy("-Time").Limit(2,0).All(&newGoods)
+	qs.RelatedSel("GoodsType").Filter("GoodsType__Name", goodsSKU.GoodsType.Name).OrderBy("-Time").Limit(2, 0).All(&newGoods)
 	//返回数据
 	fmt.Println()
 	this.Data["newGoods"] = newGoods
@@ -192,34 +193,103 @@ func (this *GoodsController) ShowGoodsDetail() {
 	this.TplName = "detail.html"
 }
 
+/*
+ 定义函数,获取当前页码范围
+ 参1:总页码数;参2:当前页码数
+*/
+func GetPages(pageCount int, pageIndex int) []int {
+	//定义切片,存入当前页码范围
+	var pages []int
+	//总页数小于5
+	if pageCount <= 5 {
+		for i := 1; i <= pageCount; i++ {
+			pages = append(pages, i)
+		}
+	} else if pageIndex <= 3 {
+		for i := 1; i <= 5; i++ {
+			pages = append(pages, i)
+		}
+	} else if pageIndex >= pageCount-2 {
+		for i := pageCount - 4; i <= pageCount; i++ {
+			pages = append(pages, i)
+		}
+	} else {
+		for i := pageIndex - 2; i <= pageIndex+2; i++ {
+			pages = append(pages, i)
+		}
+	}
+	//返回页码范围
+	return pages
+}
+
 /* 定义函数,负责展示同一类所有商品 */
 func (this *GoodsController) ShowTypeList() {
 	//获取数据,类型id
-	id,err := this.GetInt("id")
+	id, err := this.GetInt("id")
 	//校验数据
 	if err != nil {
 		fmt.Println("该类型不存在!")
-		this.Redirect("/index_sx",302)
+		this.Redirect("/index_sx", 302)
 		return
 	}
 	//处理数据
 	//联合查询,查询该类型下的所有商品
 	o := orm.NewOrm()
 	var goodsSKUs []models.GoodsSKU
-	qs := o.QueryTable("GoodsSKU").RelatedSel("GoodsType").Filter("GoodsType__Id",id)
+	qs := o.QueryTable("GoodsSKU").RelatedSel("GoodsType").Filter("GoodsType__Id", id)
 
+	//列表页分页实现
+	//获取总记录数
+	count, _ := qs.Count()
+	//定义每页记录数
+	var pageSize int = 1
+	//获取总页码
+	pageCount := math.Ceil(float64(count) / float64(pageSize))
+	//获取当前页数
+	pageIndex, err := this.GetInt("pageIndex")
+	fmt.Println(11111111)
+	if err != nil {
+		pageIndex = 1
+	}
+	fmt.Println(pageIndex)
+
+	//调用函数,获取当前页码范围
+	pages := GetPages(int(pageCount), pageIndex)
+	this.Data["pages"] = pages
+
+	//实现上一页和下一页功能
+	var prePage, nextPage int
+	//判断范围
+	if pageIndex-1 <= 0 {
+		prePage = 1
+	} else {
+		prePage = pageIndex - 1
+	}
+
+	if pageIndex+1 >= int(pageCount) {
+		nextPage = int(pageCount)
+	} else {
+		nextPage = pageIndex + 1
+	}
+
+	this.Data["prePage"] = prePage
+	this.Data["nextPage"] = nextPage
+
+	//查询当前页的数据记录
+	qs = qs.Limit(pageSize, pageSize*(pageIndex-1))
+	//列表页排序实现
 	//获取排序字段
 	sort := this.GetString("sort")
-	if sort=="" {	//sort=="",默认排序,正常查询
+	if sort == "" { //sort=="",默认排序,正常查询
 		qs.All(&goodsSKUs)
-	}else if sort == "price" {
+	} else if sort == "price" {
 		qs.OrderBy("-Price").All(&goodsSKUs)
-	}else {
+	} else {
 		qs.OrderBy("-Sales").All(&goodsSKUs)
 	}
+	this.Data["sort"] = sort
 	//返回数据
 	this.Data["id"] = id
-	this.Data["sort"] = sort
-	this.Data["goodsSKUs"] =goodsSKUs
+	this.Data["goodsSKUs"] = goodsSKUs
 	this.TplName = "list.html"
 }

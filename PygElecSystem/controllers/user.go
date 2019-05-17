@@ -40,7 +40,7 @@ func (this *UserController) HandleSendMsg() {
 	phone := this.GetString("phone")
 	//1.定义一个传递给ajax json数据的容器
 	resp := make(map[string]interface{})
-	defer RespFunc(this, resp)
+	defer RespFunc(&this.Controller, resp)
 	//返回json格式数据
 	//校验数据
 	if phone == "" {
@@ -121,7 +121,7 @@ func (this *UserController) HandleSendMsg() {
 }
 
 /* 定义函数，负责统一返回json数据到前台 */
-func RespFunc(this *UserController, resp map[string]interface{}) {
+func RespFunc(this *beego.Controller, resp map[string]interface{}) {
 	//3.把容器传递给前端
 	this.Data["json"] = resp
 	//4.指定传递方式，以json格式传递数据

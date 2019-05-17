@@ -25,7 +25,7 @@
                 <span>|</span>
                 <a href="user_center_info.html">用户中心</a>
                 <span>|</span>
-                <a href="cart.html">我的购物车</a>
+                <a href="/cart">我的购物车</a>
                 <span>|</span>
                 <a href="user_center_order.html">我的订单</a>
             </div>
@@ -90,7 +90,7 @@
         <div class="goods_num clearfix">
             <div class="num_name fl">数 量：</div>
             <div class="num_add fl">
-                <input type="text" class="num_show fl" value="1">
+                <input type="text" class="num_show fl" value="1" goodsId="{{.goodsSKU.Id}}">
                 <a href="javascript:;" class="add fr">+</a>
                 <a href="javascript:;" class="minus fr">-</a>
             </div>
@@ -151,7 +151,7 @@
 </div>
 <div class="add_jump"></div>
 
-<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+<script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
 <script type="text/javascript">
     var $add_x = $('#add_cart').offset().top;
     var $add_y = $('#add_cart').offset().left;
@@ -160,18 +160,85 @@
     var $to_y = $('#show_count').offset().left;
 
     $(".add_jump").css({'left': $add_y + 80, 'top': $add_x + 10, 'display': 'block'})
+    //购物车点击添加事件
     $('#add_cart').click(function () {
+        //添加到购物车,使用ajax发送post请求到后台
+        //获取自定义属性用attr,获取原有属性用prop
+        goodsId = $(".num_show").attr("goodsId")
+        num = $(".num_show").val()
+        //自定义json参数
+        param = {"goodsId": goodsId, "num": num}
+        $.post("/addCart", param, function (data) {
+            if (data.errno != 5) {
+                alert(data.errmsg)
+            }
+        })
+
         $(".add_jump").stop().animate({
                     'left': $to_y + 7,
                     'top': $to_x + 7
-                },
-                "fast", function () {
+                    },
+                    "fast", function () {
                     $(".add_jump").fadeOut('fast', function () {
-                        $('#show_count').html(2);
+                        $('#show_count').html(num);
                     });
-
-                });
+        });
     })
+
+    //点击标签添加商品数量
+    $(".add").click(function () {
+        //显示的数量加1
+        num = $(".num_show").val()
+        num = parseInt(num) + 1
+        $(".num_show").val(num)
+
+        //每加一次数量,都调用函数,计算总价
+        CalcTotalPrice()
+    });
+
+    //定义函数,计算商品总价,总价 = 单价*数量
+    function CalcTotalPrice() {
+        //获取单价,获取input的值用value,获取非input的值用text
+        price = $(".show_pirze").children("em").text();
+        price = parseFloat(price)
+        //数量
+        count = $(".num_show").val()
+        //计算总价
+        totalPrice = price * parseInt(count)
+        $(".total").children("em").text(totalPrice.toFixed(2) + "元")
+    }
+
+    //调用函数,计算总价
+    CalcTotalPrice()
+
+    //点击标签减少商品数量
+    $(".minus").click(function () {
+        //显示的数量减1
+        //获取原来的数量
+        num = $(".num_show").val()
+        num = parseInt(num) - 1
+        //判断num范围
+        if (num <= 1) {
+            num = 1
+        }
+        //赋值
+        $(".num_show").val(num)
+
+        //每减一次数量,都调用函数,计算总价
+        CalcTotalPrice()
+    });
+
+    //手动输入商品数量
+    $(".num_show").blur(function () {
+        //对输入的值做校验,判断是否是数字,是否都是空格,值是否小于0
+        num = $(this).val()
+        if (isNaN(num) || num.trim().length == 0 || parseInt(num) <= 0) {
+            num = 1
+            $(this).val(num)
+        }
+        //修改总价
+        CalcTotalPrice()
+    });
 </script>
 
 </body>

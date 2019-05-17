@@ -35,14 +35,13 @@ Linux系统下开发，主要开发工具包括:Linux,Git,GoLand,mysql,redis等�
 ---
 + **Beego框架安装**
 ---
-+ Mysql安装
++ **Mysql安装**
 ---
-+ Redis安装
++ **Redis安装**
 ---
-+ FastDFS安装
++ **FastDFS安装**
 ---
-+ Nginx安装
----
++ **Nginx安装**
 ## 用法
 后续更新
 

@@ -26,6 +26,7 @@ Linux系统下开发，主要开发工具包括:Linux,Git,GoLand,mysql,redis等�
 整个项目是在Linux系统下进行开发，使用的是VMware14.1.1+Ubuntu18.04,安装包下载链接如下：
 
 + [VMware14](https://my.vmware.com/cn/web/vmware/info/slug/desktop_end_user_computing/vmware_workstation_pro/14_0)
+
 这里记得要针对你电脑选择不同的版本，for windows或者for Linux.
 
 + [Ubuntu18.04](https://www.ubuntu.com/download/desktop)

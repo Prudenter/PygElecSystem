@@ -119,7 +119,7 @@
                 <上一页
             </a>
             {{range $key,$value := .pages}}
-                <a href="/goodsType?id={{$.id}}&sort={{$.sort}}&pageIndex={{$value}}" class="active">{{$value}}</a>
+                <a href="/goodsType?id={{$.id}}&sort={{$.sort}}&pageIndex={{$value}}" {{if compare $.pageIndex $value}} class="active" {{end}}>{{$value}}</a>
             {{end}}
             <a href="/goodsType?id={{.id}}&sort={{.sort}}&pageIndex={{.nextPage}}">下一页></a>
         </div>

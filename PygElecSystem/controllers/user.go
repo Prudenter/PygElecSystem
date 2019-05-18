@@ -363,10 +363,10 @@ func (this *UserController) Logout() {
 /* 定义函数,负责用户中心个人信息页面展示 */
 func (this *UserController) ShowUserCenterInfo() {
 	//调用函数,获取当前登录用户
-	user := GetUser(this)
+	user := GetUser(&this.Controller)
 	this.Data["user"] = user
 	//调用函数,获取当前登录用户的默认地址
-	this.Data["address"] = GetUserAddr(this)
+	this.Data["address"] = GetUserAddr(&this.Controller)
 	//实现视图布局,将模板与主要部分连接其起来
 	this.Layout = "user_center_layout.html"
 	this.Data["num"] = 1
@@ -374,7 +374,7 @@ func (this *UserController) ShowUserCenterInfo() {
 }
 
 /* 定义函数,获取当前登录用户 */
-func GetUser(this *UserController) models.User {
+func GetUser(this *beego.Controller) models.User {
 	//根据session获取当前登录用户名
 	userName := this.GetSession("userName")
 	o := orm.NewOrm()
@@ -388,7 +388,7 @@ func GetUser(this *UserController) models.User {
 }
 
 /* 定义函数,查询当前用户默认地址*/
-func GetUserAddr(this *UserController) models.Address {
+func GetUserAddr(this *beego.Controller) models.Address {
 	//查询数据库,显示默认地址
 	o := orm.NewOrm()
 	var address models.Address
@@ -408,10 +408,10 @@ func GetUserAddr(this *UserController) models.Address {
 /* 定义函数,负责收货地址页面展示 */
 func (this *UserController) ShowSite() {
 	//调用函数,获取当前登录用户
-	user := GetUser(this)
+	user := GetUser(&this.Controller)
 	this.Data["user"] = user
 	//调用函数,获取当前登录用户的默认地址
-	this.Data["address"] = GetUserAddr(this)
+	this.Data["address"] = GetUserAddr(&this.Controller)
 	//实现视图布局,将模板与主要部分连接其起来
 	this.Layout = "user_center_layout.html"
 	this.Data["num"] = 3
@@ -445,7 +445,7 @@ func (this *UserController) HandleSite() {
 	o := orm.NewOrm()
 	var address models.Address
 	//调用函数,获取当前登录用户
-	user := GetUser(this)
+	user := GetUser(&this.Controller)
 	//给插入对象赋值
 	address.Addr = addr
 	address.User = &user

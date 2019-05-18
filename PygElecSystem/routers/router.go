@@ -36,6 +36,8 @@ func init() {
 	beego.Router("/goodsDetail", &controllers.GoodsController{}, "get:ShowGoodsDetail")
 	//展示同一类型所有商品
 	beego.Router("/goodsType", &controllers.GoodsController{}, "get:ShowTypeList")
+	//商品搜索
+	beego.Router("/search", &controllers.GoodsController{}, "post:HandleSearch")
 	//添加商品到购物车
 	beego.Router("/addCart", &controllers.CartController{}, "post:HandleAddCart")
 	//购物车展示

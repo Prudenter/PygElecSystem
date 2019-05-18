@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"strings"
 	"PygElecSystem/PygElecSystem/models"
 	"fmt"
 	"math"
@@ -11,37 +10,6 @@ import (
 
 type GoodsController struct {
 	beego.Controller
-}
-
-/* 定义函数,获取当前登录用户 */
-func GoodsGetUser(this *GoodsController) models.User {
-	//根据session获取当前登录用户名
-	userName := this.GetSession("userName")
-	o := orm.NewOrm()
-	var user models.User
-	user.Name = userName.(string)
-	o.Read(&user, "Name")
-	//手机号码加密
-	str := user.Phone
-	user.Phone = strings.Join([]string{str[0:3], "****", str[7:]}, "");
-	return user
-}
-
-/* 定义函数,查询当前用户默认地址*/
-func GoodsGetUserAddr(this *GoodsController) models.Address {
-	//查询数据库,显示默认地址
-	o := orm.NewOrm()
-	var address models.Address
-	//获取当前用户的默认地址
-	userName := this.GetSession("userName").(string)
-	qs := o.QueryTable("Address")
-	qs.RelatedSel("User").Filter("User__Name", userName).Filter("IsDefault", true).One(&address)
-	//手机号码加密
-	if address.Phone != "" {
-		str := address.Phone
-		address.Phone = strings.Join([]string{str[0:3], "****", str[7:]}, "")
-	}
-	return address
 }
 
 /* 定义函数,负责商品首页展示 */
@@ -100,10 +68,10 @@ func (this *GoodsController) ShowIndex() {
 /* 定义函数,负责全部订单页面显示 */
 func (this *GoodsController) ShowOrder() {
 	//调用函数,获取当前登录用户
-	user := GoodsGetUser(this)
+	user := GetUser(&this.Controller)
 	this.Data["user"] = user
 	////调用函数,获取当前登录用户的默认地址
-	this.Data["address"] = GoodsGetUserAddr(this)
+	this.Data["address"] = GetUserAddr(&this.Controller)
 	//实现视图布局,将模板与主要部分连接其起来
 	this.Layout = "user_center_layout.html"
 	this.Data["num"] = 2
@@ -247,12 +215,9 @@ func (this *GoodsController) ShowTypeList() {
 	pageCount := math.Ceil(float64(count) / float64(pageSize))
 	//获取当前页数
 	pageIndex, err := this.GetInt("pageIndex")
-	fmt.Println(11111111)
 	if err != nil {
 		pageIndex = 1
 	}
-	fmt.Println(pageIndex)
-
 	//调用函数,获取当前页码范围
 	pages := GetPages(int(pageCount), pageIndex)
 	this.Data["pages"] = pages
@@ -289,7 +254,26 @@ func (this *GoodsController) ShowTypeList() {
 	}
 	this.Data["sort"] = sort
 	//返回数据
+	this.Data["pageIndex"] = pageIndex
 	this.Data["id"] = id
 	this.Data["goodsSKUs"] = goodsSKUs
 	this.TplName = "list.html"
+}
+
+/* 定义函数,负责页面搜索框搜索 */
+func (this *GoodsController) HandleSearch() {
+	//获取数据
+	goodsName := this.GetString("goodsName")
+	//校验数据
+	if goodsName == ""{
+		this.Redirect("/index",302)
+	}
+	//处理数据
+	o := orm.NewOrm()
+	var goods []models.GoodsSKU
+	//模糊查询,icontains-判断指定的字段是否包含第二个参数的值,i表示不区分大小写
+	o.QueryTable("GoodsSKU").Filter("Name__icontains",goodsName).All(&goods)
+	//返回数据
+	this.Data["goods"] = goods
+	this.TplName = "search.html"
 }

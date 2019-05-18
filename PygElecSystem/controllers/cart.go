@@ -73,14 +73,14 @@ func (this *CartController) ShowCart() {
 		return
 	}
 	defer conn.Close()
-	//查询所有购物车数据,返回的是数字字符对应的ASCII码值
+	//查询所有购物车数据,返回的是数字字符对应的ASCII码值,类型是interface{}
 	resp, err := conn.Do("hgetall", "cart_"+userName.(string))
 	if err != nil {
 		fmt.Println("获取数据异常!")
 		this.Redirect("/index_sx", 302)
 		return
 	}
-	//将ASCII码切片转换为int切片
+	//将interface{}转换为int类型切片
 	result, _ := redis.Ints(resp, err)
 
 	//处理数据

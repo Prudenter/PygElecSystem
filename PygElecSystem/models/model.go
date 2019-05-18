@@ -15,6 +15,7 @@ type User struct {
 	Email string 			`orm:"null"`				//邮箱
 	Active bool 			`orm:"default(false)"`		//是否激活
 	Addresses []*Address 	`orm:"reverse(many)"`		//联系地址
+	OrderInfos []*OrderInfo `orm:"reverse(many)"`		//订单信息
 }
 
 //用户地址表，并与用户表建立1：n关系
@@ -26,6 +27,7 @@ type Address struct {
 	Phone string 			`orm:"size(11)"`		//联系电话
 	IsDefault bool			`orm:"default(false)"`  //是否时默认地址
 	User *User 				`orm:"rel(fk)"`			//所属用户
+	OrderInfos []*OrderInfo `orm:"reverse(many)"`	//订单信息
 }
 
 //首页商品类型展示表-三级联动
@@ -50,9 +52,9 @@ type Goods struct {
 //商品类型表
 type GoodsType struct{
 	Id int
-	Name string			//种类名称
-	Logo string			//logo
-	Image string   		//图片
+Name string								//种类名称
+	Logo string							//logo
+	Image string   						//图片
 	GoodsSKU []*GoodsSKU 							`orm:"reverse(many)"`
 	IndexTypeGoodsBanner  []*IndexTypeGoodsBanner  	`orm:"reverse(many)"`
 }
@@ -60,17 +62,17 @@ type GoodsType struct{
 //商品SKU表
 type GoodsSKU struct {
 	Id int
-	Goods     *Goods 	 `orm:"rel(fk)"` //商品SPU
-	GoodsType *GoodsType `orm:"rel(fk)"`  //商品所属种类
-	Name       string					 //商品名称
-	Desc       string					 //商品简介
-	Price      int						 //商品价格
-	Unite      string					 //商品单位
-	Image      string				 	 //商品图片
-	Stock      int	`orm:"default(1)"`	 //商品库存
-	Sales      int	`orm:"default(0)"`	 //商品销量
-	Status     int	 `orm:"default(1)"`	 //商品状态
-	Time       time.Time `orm:"auto_now_add"`  //添加时间
+	Goods     *Goods 	 `orm:"rel(fk)"` 		//商品SPU
+	GoodsType *GoodsType `orm:"rel(fk)"`  		//商品所属种类
+	Name       string					 		//商品名称
+	Desc       string					 		//商品简介
+	Price      int						 		//商品价格
+	Unite      string					 		//商品单位
+	Image      string				 	 		//商品图片
+	Stock      int	`orm:"default(1)"`	 		//商品库存
+	Sales      int	`orm:"default(0)"`	 		//商品销量
+	Status     int	 `orm:"default(1)"`	 		//商品状态
+	Time       time.Time `orm:"auto_now_add"`  	//添加时间
 	GoodsImage []*GoodsImage `orm:"reverse(many)"`
 	IndexGoodsBanner   []*IndexGoodsBanner `orm:"reverse(many)"`
 	IndexTypeGoodsBanner []*IndexTypeGoodsBanner  `orm:"reverse(many)"`
@@ -80,8 +82,8 @@ type GoodsSKU struct {
 //商品图片表
 type GoodsImage struct {
 	Id 			int
-	Image 		string					//商品图片
-	GoodsSKU 	*GoodsSKU   `orm:"rel(fk)"` //商品SKU
+	Image 		string							//商品图片
+	GoodsSKU 	*GoodsSKU   `orm:"rel(fk)"` 	//商品SKU
 }
 
 //首页轮播商品展示表
@@ -106,24 +108,23 @@ type IndexPromotionBanner struct {
 	Id 		int
 	Name 	string	`orm:"size(20)"`				//活动名称
 	Url 	string	`orm:"size(50)"`				//活动链接
-	Image 	string						//活动图片
-	Index 	int  `orm:"default(0)"` //展示顺序
+	Image 	string									//活动图片
+	Index 	int  `orm:"default(0)"` 				//展示顺序
 }
 
 //订单表
 type OrderInfo struct {
 	Id 				int
-	OrderId         string  `orm:"unique"`
-	User 			*User	`orm:"rel(fk)"`		//用户
-	Address 		*Address`orm:"rel(fk)"`		//地址
-	PayMethod 		int							//付款方式
-	TotalCount 	int		`orm:"default(1)"`	//商品数量
-	TotalPrice 	int							//商品总价
-	TransitPrice 	int							//运费
-	Orderstatus 	int 	`orm:"default(1)"`	//订单状态
-	TradeNo 		string	`orm:"default('')"`	//支付编号
+	OrderId         string  `orm:"unique"`				//订单号
+	User 			*User	`orm:"rel(fk)"`				//用户
+	Address 		*Address`orm:"rel(fk)"`				//地址
+	PayMethod 		int									//付款方式
+	TotalCount 	    int		`orm:"default(1)"`			//商品数量
+	TotalPrice 	    int									//商品总价
+	TransitPrice 	int									//运费
+	Orderstatus 	int 	`orm:"default(1)"`			//订单状态
+	TradeNo 		string	`orm:"default('')"`			//支付编号
 	Time			time.Time `orm:"auto_now_add"`		//订单时间
-
 	OrderGoods   []*OrderGoods `orm:"reverse(many)"`
 }
 

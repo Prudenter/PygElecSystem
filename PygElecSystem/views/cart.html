@@ -52,21 +52,21 @@
 </ul>
 {{range .goods}}
     <ul class="cart_list_td clearfix">
-    <li class="col01"><input type="checkbox" name="" checked></li>
-    <li class="col02"><img src="http://192.168.11.77:8888/{{.goodsSKU.Image}}"></li>
-    <li class="col03">{{.goodsSKU.Name}}<br><em>{{.goodsSKU.Price}}元/{{.goodsSKU.Unite}}g</em></li>
-    <li class="col04">{{.goodsSKU.Unite}}g</li>
-    <li class="col05">{{.goodsSKU.Price}}元</li>
-    <li class="col06">
-        <div class="num_add">
-            <a href="javascript:;" class="add fl">+</a>
-            <input type="text" class="num_show fl" value="{{.count}}">
-            <a href="javascript:;" class="minus fl">-</a>
-        </div>
-    </li>
-    <li class="col07">{{.littlePrice}}元</li>
-    <li class="col08"><a href="javascript:;">删除</a></li>
-</ul>
+        <li class="col01"><input type="checkbox" class="checkGoods" name="" checked></li>
+        <li class="col02"><img src="http://192.168.11.77:8888/{{.goodsSKU.Image}}"></li>
+        <li class="col03">{{.goodsSKU.Name}}<br><em>{{.goodsSKU.Price}}元/{{.goodsSKU.Unite}}g</em></li>
+        <li class="col04">{{.goodsSKU.Unite}}g</li>
+        <li class="col05">{{.goodsSKU.Price}}元</li>
+        <li class="col06">
+            <div class="num_add">
+                <a href="javascript:;" class="add fl">+</a>
+                <input type="text" class="num_show fl" value="{{.count}}">
+                <a href="javascript:;" class="minus fl">-</a>
+            </div>
+        </li>
+        <li class="col07">{{.littlePrice}}元</li>
+        <li class="col08"><a href="javascript:;">删除</a></li>
+    </ul>
 {{end}}
 
 <ul class="settlements">
@@ -102,8 +102,53 @@
             //设置所有复选框状态
             $(this).prop("checked", checked)
         })
+        //调用函数计算总价和总件数
+        CalcTotalPrice()
     });
 
+    // 一个复选框对所有复选框的影响
+    $(".checkGoods").change(function () {
+        //改变之后,查看当前状态是否是选中状态
+        //查询所有复选框
+        allCount = $(".cart_list_td").find(":checkbox").length
+        //查询所有被选中的复选框
+        checkedCount = $('.cart_list_td').find(":checked").length
+        //比较两者
+        if (allCount == checkedCount){
+            $("#allCheck").prop("checked","checked")
+        }else {
+            $("#allCheck").prop("checked","")
+        }
+        //调用函数,计算总价和总件数
+        CalcTotalPrice()
+    });
+
+    //计算总价和总件数
+    function CalcTotalPrice() {
+        //获取选中的复选框所在行的小计
+        var totalPrice = 0
+        $(".cart_list_td").find(":checked").each(function () {
+            //获取选中的复选框所在行的小计
+            littlePrice = $(this).parents(".cart_list_td").find(".col07").text()    //注意:parent和parents的区别
+            //计算总价
+            totalPrice += parseInt(littlePrice)
+        });
+        //把总价放回显示总价的地方
+        $(".settlements").children(".col03").find("em").text(totalPrice.toFixed(2)+"元")
+        //查询所有被选中的复选框
+        checkedCount = $(".cart_list_td").find(":checked").length
+        //把总件数放回显示的地方
+        $(".settlements").children(".col03").find("b").text(checkedCount)
+        $(".total_count").children("em").text(checkedCount)
+    }
+
+    //调用函数计算总价和总件数
+    CalcTotalPrice()
+
+    //添加购物车数量
+
+
+    
 </script>
 </body>
 </html>

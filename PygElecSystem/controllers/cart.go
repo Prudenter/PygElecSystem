@@ -117,3 +117,89 @@ func (this *CartController) ShowCart() {
 	this.Data["goods"] = goods
 	this.TplName = "cart.html"
 }
+
+/* 定义函数,负责修改购物车数量的业务处理 */
+func (this *CartController) HandleChangeCartCount() {
+	//获取数据
+	//获取商品id
+	goodsId,err1 := this.GetInt("goodsId")
+	//获取数量
+	count,err2 := this.GetInt("count")
+
+	//校验数据,返回json数据给ajax
+	resp := make(map[string]interface{})
+	defer RespFunc(&this.Controller,resp)
+	if err1 != nil || err2 != nil {
+		fmt.Println(err1,err2)
+		fmt.Println("获取数据不完整!")
+		resp["errno"] = 1
+		resp["errmsg"] = "获取数据不完整!"
+		return
+	}
+	//获取session中的用户名
+	userName := this.GetSession("userName")
+	if userName==nil {
+		fmt.Println("当前用户未登录!")
+		resp["errno"] = 2
+		resp["errmsg"] = "当前用户未登录!"
+		return
+	}
+
+	//修改redis中当前用户当前商品的数量
+	//连接redis数据库
+	conn,err := redis.Dial("tcp","127.0.0.1:6379")
+	if err != nil {
+		fmt.Println("redis连接异常!")
+		resp["errno"] = 3
+		resp["errmsg"] = "网络连接异常!"
+		return
+	}
+	//修改数据
+	_,err = conn.Do("hset","cart_"+userName.(string),goodsId,count)
+	if err!=nil {
+		fmt.Println("redis写入异常!")
+		resp["errno"] = 4
+		resp["errmsg"] = "redis写入异常!"
+		return
+	}
+	//返回数据
+	resp["errno"] = 5
+	resp["errmsg"] = "ok!"
+}
+
+/* 定义函数,负责删除购物车商品 */
+func (this *CartController) HandleDeleteCart() {
+	//获取数据
+	id,err := this.GetInt("id")
+	//校验数据
+	if err != nil {
+		fmt.Println("删除连接错误!")
+		this.Redirect("/user/showCart",302)
+		return
+	}
+	//校验是否是登录状态
+	userName := this.GetSession("userName")
+	if userName == nil {
+		fmt.Println("当前用户不在登录状态!")
+		this.Redirect("/user/showCart",302)
+		return
+	}
+
+	//向redis中写入数据
+	conn,err :=redis.Dial("tcp","127.0.0.1:6379")
+	if err != nil {
+		fmt.Println("服务器连接异常!")
+		this.Redirect("/user/showCart",302)
+		return
+	}
+	defer conn.Close()
+	//删除数据
+	_,err = conn.Do("hdel","cart_"+userName.(string),id)
+	if err != nil {
+		fmt.Println("数据库操作异常!")
+		this.Redirect("/user/showCart",302)
+		return
+	}
+	//返回数据
+	this.Redirect("/user/showCart",302)
+}

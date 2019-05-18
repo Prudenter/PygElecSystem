@@ -52,9 +52,9 @@ type Goods struct {
 //商品类型表
 type GoodsType struct{
 	Id int
-Name string								//种类名称
-	Logo string							//logo
-	Image string   						//图片
+	Name string								//种类名称
+	Logo string								//logo
+	Image string   							//图片
 	GoodsSKU []*GoodsSKU 							`orm:"reverse(many)"`
 	IndexTypeGoodsBanner  []*IndexTypeGoodsBanner  	`orm:"reverse(many)"`
 }

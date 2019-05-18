@@ -42,6 +42,10 @@ func init() {
 	beego.Router("/addCart", &controllers.CartController{}, "post:HandleAddCart")
 	//购物车展示
 	beego.Router("/user/showCart", &controllers.CartController{}, "get:ShowCart")
+	//修改购物车数量,包括:+,-,直接在输入框输入
+	beego.Router("/changeCartCount", &controllers.CartController{}, "post:HandleChangeCartCount")
+	//删除购物车商品
+	beego.Router("/deleteCart", &controllers.CartController{}, "get:HandleDeleteCart")
 }
 
 /* 定义过滤函数 */

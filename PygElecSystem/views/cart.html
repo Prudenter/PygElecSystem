@@ -53,7 +53,8 @@
 <form action="/user/addOrder" method="post">
     {{range .goods}}
     <ul class="cart_list_td clearfix">
-        <li class="col01"><input type="checkbox" class="checkGoods" name="" checked></li>
+        {{/*form表单中,如果input类型是checkbox,提交表单时将只提交选中的checkbox的value值*/}}
+        <li class="col01"><input type="checkbox" class="checkGoods" name="goodsIds" checked value="{{.goodsSKU.Id}}"></li>
         <li class="col02"><img src="http://192.168.11.77:8888/{{.goodsSKU.Image}}"></li>
         <li class="col03">{{.goodsSKU.Name}}<br><em>{{.goodsSKU.Price}}元/{{.goodsSKU.Unite}}g</em></li>
         <li class="col04">{{.goodsSKU.Unite}}g</li>
@@ -270,6 +271,8 @@
         }
     });
 
+
+    //删除购物车商品
     $(".dels").click(function () {
         if (!confirm("是否要删除次商品?")){
             return false

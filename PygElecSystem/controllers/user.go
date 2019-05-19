@@ -341,7 +341,7 @@ func (this *UserController) HandleLogin() {
 
 	//根据m1的值,判断是否实现记住用户名
 	if m1 == 2 {
-		this.Ctx.SetCookie("userName", userName, 3000)
+		this.Ctx.SetCookie("userName", userName, 60*100)
 	} else {
 		//设置存活时间为-1,使cookie失效
 		this.Ctx.SetCookie("userName", userName, -1)

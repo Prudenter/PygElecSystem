@@ -28,8 +28,6 @@ func init() {
 	beego.Router("/user/userCenterInfo", &controllers.UserController{}, "get:ShowUserCenterInfo")
 	//用户中心收货地址页面
 	beego.Router("/user/site", &controllers.UserController{}, "get:ShowSite;post:HandleSite")
-	//用户中心全部订单页面
-	beego.Router("/user/order", &controllers.GoodsController{}, "get:ShowOrder")
 	//生鲜首页
 	beego.Router("/index_sx", &controllers.GoodsController{}, "get:ShowIndex_sx")
 	//商品详情
@@ -48,6 +46,10 @@ func init() {
 	beego.Router("/deleteCart", &controllers.CartController{}, "get:HandleDeleteCart")
 	//添加商品到订单
 	beego.Router("/user/addOrder", &controllers.OrderController{}, "post:ShowOrder")
+	//提交订单
+	beego.Router("/commitOrder", &controllers.OrderController{}, "post:HandleCommitOrder")
+	//用户中心全部订单页面
+	beego.Router("/user/userOrder", &controllers.UserController{}, "get:ShowUserOrder")
 }
 
 /* 定义过滤函数 */

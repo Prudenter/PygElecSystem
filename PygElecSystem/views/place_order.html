@@ -47,7 +47,8 @@
     <dl>
         <dt>寄送到：</dt>
     {{range .addrs}}
-        <dd><input type="radio" name="address" {{if compare .IsDefault true}}checked{{end}}>{{.Addr}} （{{.Receiver}}
+        <dd><input type="radio" name="address" value="{{.Id}}" {{if compare .IsDefault true}}checked{{end}}>{{.Addr}}
+            （{{.Receiver}}
             收） {{.Phone}}</dd>
     {{end}}
     </dl>
@@ -58,13 +59,13 @@
 <h3 class="common_title">支付方式</h3>
 <div class="common_list_con clearfix">
     <div class="pay_style_con clearfix">
-        <input type="radio" name="pay_style" checked>
+        <input type="radio" name="pay_style" checked value="1">
         <label class="cash">货到付款</label>
-        <input type="radio" name="pay_style">
+        <input type="radio" name="pay_style" value="2">
         <label class="weixin">微信支付</label>
-        <input type="radio" name="pay_style">
+        <input type="radio" name="pay_style" value="3">
         <label class="zhifubao"></label>
-        <input type="radio" name="pay_style">
+        <input type="radio" name="pay_style" value="4">
         <label class="bank">银行卡支付</label>
     </div>
 </div>
@@ -129,31 +130,39 @@
 
     <div class="mask"></div>
 </div>
-<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+<script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
 <script type="text/javascript">
     $('#order_btn').click(function () {
-
-        // //点击提交订单,把当前页面数据传递到后台,让后台插入数据
-        // addrId = $('input[name ="address"]:checked').val()
-        // //获取支付方式
-        // payId = $('input[name ="pay_style"]:checked').val()
-        // //获取商品信息
-        // goodsIds = $(this).attr("goodsIds")
-        // //获取总金额和总件数
-        // totalCount = $(".total_goods_count").children("")
-
-
-
-        // localStorage.setItem('order_finish', 2);
-        //
-        // $('.popup_con').fadeIn('fast', function () {
-        //
-        //     setTimeout(function () {
-        //         $('.popup_con').fadeOut('fast', function () {
-        //             window.location.href = 'index.html';
-        //         });
-        //     }, 3000)
-        // });
+        //点击提交订单,把当前页面数据传递到后台,让后台插入数据
+        addrId = $('input[name ="address"]:checked').val()
+        //获取支付方式
+        payId = $('input[name ="pay_style"]:checked').val()
+        //获取商品信息
+        goodsIds = $(this).attr("goodsIds")
+        //获取总金额和总件数及运费
+        totalCount = $(".total_goods_count").children("em").text()
+        totalPrice = $(".total_goods_count").children("b").text()
+        postage = $(".transit").children("b").text()
+        //定义json类型参数,用于ajax传递参数
+        param = {
+            "addrId": addrId, "payId": payId, "goodsIds": goodsIds, "totalCount": parseInt(totalCount),
+            "totalPrice": parseInt(totalPrice), "postage": parseInt(postage)
+        }
+        //使用ajaxj发送post请求到后台
+        $.post("/commitOrder", param, function (data) {
+            if (data.errno != 5) {
+                alert(data.errmsg)
+            } else {
+                localStorage.setItem('order_finish', 2);
+                $('.popup_con').fadeIn('fast', function () {
+                    setTimeout(function () {
+                        $('.popup_con').fadeOut('fast', function () {
+                            window.location.href = '/user/userOrder';  //相当于a标签
+                        });
+                    }, 3000)
+                });
+            }
+        })
     });
 </script>
 </body>

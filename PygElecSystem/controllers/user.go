@@ -441,6 +441,7 @@ func (this *UserController) HandleSite() {
 		this.Redirect("/user/site", 302)
 		return
 	}
+
 	//处理数据,插入数据
 	o := orm.NewOrm()
 	var address models.Address
@@ -472,4 +473,18 @@ func (this *UserController) HandleSite() {
 	}
 	//返回数据
 	this.Redirect("/user/site", 302)
+}
+
+/* 定义函数,负责展示当前用户全部订单 */
+func (this *UserController) ShowUserOrder() {
+	//调用函数,获取当前登录用户
+	user := GetUser(&this.Controller)
+	this.Data["user"] = user
+	////调用函数,获取当前登录用户的默认地址
+	this.Data["address"] = GetUserAddr(&this.Controller)
+	//实现视图布局,将模板与主要部分连接其起来
+	this.Layout = "user_center_layout.html"
+	//用于页面样式判断
+	this.Data["num"] = 2
+	this.TplName = "user_center_order.html"
 }

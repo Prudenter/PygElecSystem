@@ -65,19 +65,6 @@ func (this *GoodsController) ShowIndex() {
 	this.TplName = "index.html"
 }
 
-/* 定义函数,负责全部订单页面显示 */
-func (this *GoodsController) ShowOrder() {
-	//调用函数,获取当前登录用户
-	user := GetUser(&this.Controller)
-	this.Data["user"] = user
-	////调用函数,获取当前登录用户的默认地址
-	this.Data["address"] = GetUserAddr(&this.Controller)
-	//实现视图布局,将模板与主要部分连接其起来
-	this.Layout = "user_center_layout.html"
-	this.Data["num"] = 2
-	this.TplName = "user_center_order.html"
-}
-
 /* 定义函数,负责生鲜模块首页展示 */
 func (this *GoodsController) ShowIndex_sx() {
 	//获取生鲜首页内容

@@ -128,14 +128,14 @@ type OrderInfo struct {
 	OrderGoods   []*OrderGoods `orm:"reverse(many)"`
 }
 
-//订单商品表
+//订单商品关系表
 type OrderGoods struct {
 	Id 			int
-	OrderInfo 	*OrderInfo	`orm:"rel(fk)"`	//订单
-	GoodsSKU 	*GoodsSKU	`orm:"rel(fk)"`	//商品
-	Count 		int		`orm:"default(1)"`	//商品数量
-	Price 		int							//商品价格
-	Comment 	string	`orm:"default('')"` //评论
+	OrderInfo 	*OrderInfo	`orm:"rel(fk)"`		//订单
+	GoodsSKU 	*GoodsSKU	`orm:"rel(fk)"`		//商品
+	Count 		int			`orm:"default(1)"`	//商品数量
+	Price 		int								//商品价格
+	Comment 	string		`orm:"default('')"` //评论
 }
 
 func init(){
